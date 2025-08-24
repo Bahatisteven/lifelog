@@ -1,6 +1,8 @@
 import csv
 from collections import Counter
 import os
+from datetime import datetime, date, timedelta
+
 
 
 FILE_PATH = "lifelog.csv"
@@ -70,6 +72,48 @@ def summarize(file_path=FILE_PATH):
         print(f"Most common mood: {mood} ({count} times)")
 
 
+
+date_obj = datetime.strptime("2025-08-24", "%Y-%m-%d").date()
+
+def weekly_summary(file_path=FILE_PATH):
+    """show logs and insights for the current week"""
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday())  # monday
+    end_of_week = start_of_week + timedelta(days=6)          # sunday
+
+    total_hours = 0
+    weekday_hours = {i: 0.0 for i in range(7)}  # 0=mon ... 6=sun
+
+    with open(file_path, mode="r") as file:
+        reader = csv.reader(file)
+        next(reader, None)  # skip header
+        for row in reader:
+            if len(row) < 4:
+                continue
+
+            try:
+                log_date = datetime.strptime(row[0], "%Y-%m-%d").date()
+                hours = float(row[2])
+            except Exception:
+                continue  # skip bad rows
+
+            # keep only this week
+            if start_of_week <= log_date <= end_of_week:
+                total_hours += hours
+                weekday_hours[log_date.weekday()] += hours
+
+    print("\nWeekly Summary:")
+    print(f"Week of {start_of_week} → {end_of_week}")
+    print(f"Total hours logged this week: {total_hours}")
+
+    if total_hours > 0:
+        # find most productive day
+        best_day = max(weekday_hours, key=lambda k: weekday_hours[k])
+        days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+        print(f"Most productive day: {days[best_day]} ({weekday_hours[best_day]} hours)")
+
+
+
 def main():
     init_file()
 
@@ -78,9 +122,10 @@ def main():
         print("1. Add new activity")
         print("2. Show all logs")
         print("3. Show summary")
-        print("4. Quit")
+        print("4. Weekly summary")
+        print("5. Quit")
 
-        choice = input("Choose an option (1-4): ")
+        choice = input("Choose an option (1-5): ")
 
         if choice == "1":
             add_activity()
@@ -89,10 +134,12 @@ def main():
         elif choice == "3":
             summarize()
         elif choice == "4":
-            print("👋 Goodbye!")
+            weekly_summary()
+        elif choice == "5":
+            print("👋Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter 1-4.")
+            print("Invalid choice. Please enter 1-5.")
 
 
 if __name__ == "__main__":
