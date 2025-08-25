@@ -30,6 +30,56 @@ def add_activity(file_path=FILE_PATH):
     print("Activity saved successfully!\n")
 
 
+def date_range_summary():
+    """show logs and insights for a specific date range"""
+    try:
+        start_str = input("Enter start date (YYYY-MM-DD): ")
+        end_str = input("Enter end date(YYYY-MM-DD): ")
+
+        start_date = datetime.strptime(start_str, "%Y-%m_%d").date()
+        end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
+    except ValueError:
+        print("Invalid date format. Please use YYYY-MM-DD.")
+        return
+    
+    if start_date > end_date: 
+        print("Start date must be before end date.")
+
+        total_hours = 0
+        activities = []
+        moods = []
+
+        with open(FILE_PATH, mode="r") as file:
+            reader = csv.reader(file)
+            next(reader, None) # skip header
+            for row in reader:
+                if len(row) < 4:
+                    continue
+
+                try:
+                    log_date = datetime.strptime(row[0], "%Y-%m-%d").date()
+                    hours = float(row[2])
+                except Exception:
+                    continue
+                if start_date <= log_date <= end_date:
+                    total_hours += hours
+                    activities.append(row[1])
+                    moods.append(row[3])
+
+
+        print(f"\nSummary for {start_date} → {end_date}:")
+        print(f"Total hours: {total_hours}")
+
+        if activities:
+            activity, count = Counter(activities).most_common(1)[0]
+            print(f"Most common activity: {activity} ({count} times)")
+
+        if moods:
+            mood, count = Counter(moods).most_common(1)[0]
+            print(f"Most common mood: {mood} ({count} times)")
+
+
+
 def show_logs(file_path=FILE_PATH):
     """Display all saved activities"""
     print("\nYour LifeLog Entries:")
@@ -123,9 +173,10 @@ def main():
         print("2. Show all logs")
         print("3. Show summary")
         print("4. Weekly summary")
-        print("5. Quit")
+        print("5. Date range summary")
+        print("6. Quit")
 
-        choice = input("Choose an option (1-5): ")
+        choice = input("Choose an option (1-6): ")
 
         if choice == "1":
             add_activity()
@@ -136,6 +187,8 @@ def main():
         elif choice == "4":
             weekly_summary()
         elif choice == "5":
+            date_range_summary()
+        elif choice == "6":
             print("👋Goodbye!")
             break
         else:
