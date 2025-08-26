@@ -2,7 +2,13 @@ import csv
 from collections import Counter
 import os
 from datetime import datetime, date, timedelta
+import pandas as pd
 
+df= pd.read_csv('lifelog.csv')
+
+print(df.head())  
+print(df.info())    
+print(df.describe())
 
 
 FILE_PATH = "lifelog.csv"
@@ -22,10 +28,17 @@ def add_activity(file_path=FILE_PATH):
     activity = input("Enter activity name: ")
     duration = input("Enter duration in hours: ")
     mood = input("Enter your mood: ")
+    tags = input("Enter tags (comma-separated, e.g. health,workout): ")
+    notes = input("Enter any notes (optional): ")
+
 
     with open(file_path, mode="a", newline="") as file:
         writer = csv.writer(file)
-        writer.writerow([date, activity, duration, mood])
+
+        if file.tell() == 0:
+         # if the file is empty, write header  
+         writer.writerow(["Date", "Activity", "Duration", "Mood", "Tags", "Notes"])
+        writer.writerow([date, activity, duration, mood, tags, notes])
 
     print("Activity saved successfully!\n")
 
@@ -36,7 +49,7 @@ def date_range_summary():
         start_str = input("Enter start date (YYYY-MM-DD): ")
         end_str = input("Enter end date(YYYY-MM-DD): ")
 
-        start_date = datetime.strptime(start_str, "%Y-%m_%d").date()
+        start_date = datetime.strptime(start_str, "%Y-%m-%d").date()
         end_date = datetime.strptime(end_str, "%Y-%m-%d").date()
     except ValueError:
         print("Invalid date format. Please use YYYY-MM-DD.")
@@ -163,6 +176,7 @@ def weekly_summary(file_path=FILE_PATH):
         print(f"Most productive day: {days[best_day]} ({weekday_hours[best_day]} hours)")
 
 
+# app entry point
 
 def main():
     init_file()
