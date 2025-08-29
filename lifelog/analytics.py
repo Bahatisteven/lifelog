@@ -1,8 +1,45 @@
 import csv
+import pandas as pd
+import matplotlib.pyplot as plt
 from collections import Counter
 from datetime import datetime, date, timedelta
 import os
 from lifelog.data_handler import FILE_PATH
+
+
+# load csv file
+df = pd.read_csv("lifelog.csv")
+
+df.columns = ["date", "activity", "duration", "mood"]
+
+# convert duration into numeric 
+df["duration"] = pd.to_numeric(df["duration"], errors="coerce")
+
+
+print("\n--- GROUP BY & AGGREGATIONS ---\n")
+
+# average duration per activity
+avg_duration = df.groupby("activity")["duration"].mean()
+print("Average duration per activity:\n", avg_duration, "\n")
+
+# count of moods per activity
+mood_counts = df.groupby(["activity", "mood"]).size()
+print("Mood counts per activity:\n", mood_counts, "\n")
+
+# most common activity overall
+most_common_activity = df["activity"].value_counts().head(1)
+print("Most common activity:\n", most_common_activity, "\n")
+
+# average duration per activity
+avg_duration.plot(kind="bar", title="Average Duration per Activity")
+plt.ylabel("Hours")
+plt.show()
+
+
+
+
+
+
 
 def summarize(file_path=FILE_PATH):
     """show overall summary of activities and moods"""
