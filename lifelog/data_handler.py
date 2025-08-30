@@ -1,7 +1,11 @@
 import csv
 import os
 
-FILE_PATH = os.path.join("data", "lifelog.csv")
+from LifeLog import lifelog
+
+FILE_PATH = "../data/lifelog.csv"
+
+
 
 def init_file(file_path=FILE_PATH):
     """Create CSV with header if it doesn't exist"""

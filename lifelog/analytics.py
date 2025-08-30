@@ -6,7 +6,6 @@ from datetime import datetime, date, timedelta
 import os
 from lifelog.data_handler import FILE_PATH
 
-
 # load csv file
 df = pd.read_csv("lifelog.csv")
 
@@ -36,6 +35,38 @@ plt.ylabel("Hours")
 plt.show()
 
 
+# date and time handling 
+
+# convert date column to datetime
+df["date"] = pd.to_datetime(df["date"], errors="coerce")
+
+# drop rows where date could be parsed 
+df = df.dropna(subset=["date"])
+
+print("\n--- DATE/TIME ANALYSIS ---\n")
+
+# hours per week day
+hours_per_weekday = df.groupby(df["date"].dt.day_name())["duration"].sum()
+print("Total hours per weekday:\n", hours_per_weekday, "\n")
+
+# sort weekends in order 
+ordered_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+hours_per_weekday = hours_per_weekday.reindex(ordered_days)
+
+# plot weekday trends
+hours_per_weekday.plot(kind="bar", title="Total Hours by Weekday")
+plt.ylabel("Hours")
+plt.show()
+
+# monthly activity totals
+monthly_hours = df.groupby(df["date"].dt.to_period("M"))["duration"].sum()
+print("Total hours per month:\n", monthly_hours, "\n")
+
+# plot monthly trends
+monthly_hours.plot(kind="line", marker="o", title="Total Hours by Month")
+plt.xlabel("Month")
+plt.ylabel("Hours")
+plt.show()
 
 
 
