@@ -7,13 +7,33 @@ import os
 from lifelog.data_handler import FILE_PATH
 
 # load csv file
-df = pd.read_csv("lifelog.csv")
+df = pd.read_csv(FILE_PATH)
 
+# check for missing values in columns
+print("Missing values per column:")
+print(df.isnull().sum())
+
+
+
+df["activity"] = df["activity"].str.strip().str.title() # " running " -> "Running"
+
+# save cleaned data 
+df.to_csv("lifelog_cleaned.csv", index=False)
+
+
+
+def clean_data(df):
+    
+    df["mood"] = df["mood"].fillna("Unknown") # filling missing words with "Unknown"
+    df = df.drop_duplicates()   # remove duplicate rows
+    df["activity"] = df["activity"].str.strip().str.title() # " running " -> "Running"
+    df["date"] = pd.to_datetime(df["date"], errors="coerce") 
+    df = df.dropna(subset=["date"])
+    df["duration"] = pd.to_numeric(df["duration"], errors="coerce")
+    return df
+
+df = clean_data(df)
 df.columns = ["date", "activity", "duration", "mood"]
-
-# convert duration into numeric 
-df["duration"] = pd.to_numeric(df["duration"], errors="coerce")
-
 
 print("\n--- GROUP BY & AGGREGATIONS ---\n")
 
@@ -32,13 +52,7 @@ print("Most common activity:\n", most_common_activity, "\n")
 # average duration per activity
 avg_duration.plot(kind="bar", title="Average Duration per Activity")
 plt.ylabel("Hours")
-plt.show()
-
-
-# date and time handling 
-
-# convert date column to datetime
-df["date"] = pd.to_datetime(df["date"], errors="coerce")
+plt.show() 
 
 # drop rows where date could be parsed 
 df = df.dropna(subset=["date"])
