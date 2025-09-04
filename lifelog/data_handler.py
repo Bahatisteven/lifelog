@@ -3,8 +3,7 @@ import os
 
 from LifeLog import lifelog
 
-FILE_PATH = "../data/lifelog.csv"
-
+FILE_PATH = os.path.join("data", "lifelog.csv")
 
 
 def init_file(file_path=FILE_PATH):
