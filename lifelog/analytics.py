@@ -6,6 +6,8 @@ from datetime import datetime, date, timedelta
 import os
 from lifelog.data_handler import FILE_PATH
 
+EXPORT_DIR = "exports"
+
 # load csv file
 def load_and_clean_data(file_path=FILE_PATH):
     df = pd.read_csv(file_path)
@@ -25,6 +27,25 @@ df["activity"] = df["activity"].str.strip().str.title() # " running " -> "Runnin
 # save cleaned data 
 df.to_csv("lifelog_cleaned.csv", index=False)
 
+# export aggregated CSVs
+def export_aggregates(df):
+    avg_duration = df.groupby("activity")["duration"].mean()
+    avg_duration.to_csv(os.path.join(EXPORT_DIR, "avg_duration_per_activity.csv"))
+    print("Average duration per activity exported")
+
+    hours_per_weekday = df.groupby(df["date"].dt.day_name())["duration"].sum()
+    ordered_days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    hours_per_weekday = hours_per_weekday.reindex(ordered_days)
+    hours_per_weekday.to_csv(os.path.join(EXPORT_DIR, "hours_per_weekday.csv"))
+    print("Total hours per weekday exported")
+
+
+# export cleaned dataset
+def export_cleaned_data(df):
+    """export cleaned dataset to CSV"""
+    path = os.path.join(EXPORT_DIR, "lifelog_cleaned.csv")
+    df.to_csv(path, index=False)
+    print(f"Cleaned dataset exported to {path}")
 
 
 def clean_data(df):
