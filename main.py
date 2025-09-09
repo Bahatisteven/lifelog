@@ -16,28 +16,25 @@ def main():
         print("7. Export insights")
         print("8. Quit")
 
-        choice = input("Choose an option (1-8): ")
+        choice = input("Choose an option (1-8): ").strip()
 
-        if choice == "1":
-            add_activity()
-        elif choice == "2":
-            show_logs()
-        elif choice == "3":
-            summarize()
-        elif choice == "4":
-            weekly_summary()
-        elif choice == "5":
-            date_range_summary()
-        elif choice == "6":
-            pandas_analysis()
-        elif choice == "7":
-            df = load_and_clean_data()
-            export_insights(df)
+        menu_options = {
+            "1": add_activity,
+            "2": show_logs,
+            "3": summarize,
+            "4": weekly_summary,
+            "5": date_range_summary,
+            "6": pandas_analysis,
+            "7": lambda: export_insights(load_and_clean_data())
+        }
+
+        if choice in menu_options:
+            menu_options[choice]()
         elif choice == "8":
-            print("👋 Goodbye!")
+            print("Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter 1-7.")
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
