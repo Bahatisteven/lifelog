@@ -18,7 +18,7 @@ def main():
         print("9. Search in notes")
         print("10. Quit")
 
-        choice = input("Choose an option (1-8): ")
+        choice = input("Choose an option (1-8): ").strip()
 
         menu_options = {
             "1": add_activity,
@@ -31,15 +31,16 @@ def main():
             "8": filter_by_tag,
             "9": search_notes, 
             "10": lambda: export_summary_report(load_and_clean_data())
+
         }
 
         if choice in menu_options:
             menu_options[choice]()
         elif choice == "8":
-            print("👋 Goodbye!")
+            print("Goodbye!")
             break
         else:
-            print("Invalid choice. Please enter 1-7.")
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
