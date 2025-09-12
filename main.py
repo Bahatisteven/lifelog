@@ -1,6 +1,6 @@
-from lifelog.data_handler import init_file, add_activity, show_logs
+from lifelog.data_handler import init_file, add_activity, show_logs, search_notes, filter_by_tag
 from lifelog.analytics import summarize, weekly_summary, date_range_summary 
-from lifelog.analytics import export_insights, load_and_clean_data
+from lifelog.analytics import export_summary_report, load_and_clean_data
 from lifelog.visualization import pandas_analysis
 
 def main():
@@ -14,7 +14,9 @@ def main():
         print("5. Date range summary")
         print("6. Advanced analysis (pandas + charts)")
         print("7. Export insights")
-        print("8. Quit")
+        print("8. Filter by tag")
+        print("9. Search in notes")
+        print("10. Quit")
 
         choice = input("Choose an option (1-8): ").strip()
 
@@ -25,7 +27,11 @@ def main():
             "4": weekly_summary,
             "5": date_range_summary,
             "6": pandas_analysis,
-            "7": lambda: export_insights(load_and_clean_data())
+            "7": export_summary_report,
+            "8": filter_by_tag,
+            "9": search_notes, 
+            "10": lambda: export_summary_report(load_and_clean_data())
+
         }
 
         if choice in menu_options:
