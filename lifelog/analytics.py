@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 
 from lifelog.data_handler import FILE_PATH
 
@@ -199,3 +200,91 @@ def export_all(df):
     export_summary_report(df)
     export_charts(df)
     print("\nAll exports completed!")
+
+
+
+# tag and note analytics
+
+def tag_hours(df):
+    """show total hours spent by tag"""
+    tag_hours = Counter()
+    for _, row in df.iterrows():
+        tags = str(row.get("tags", "")).split(",")
+        for tag in tags:
+            tag = tag.strip().lower()
+            if tag:
+                try:
+                    tag_hours[tag] += float(row.get("duration", 0))
+                except ValueError:
+                    continue
+
+    if not tag_hours:
+        print("No tags found.")
+        return
+
+    print("\n--- Hours by Tag ---")
+    for tag, hours in tag_hours.most_common():
+        print(f"{tag}: {hours:.2f} hours")
+
+
+def mood_by_tag(df):
+    """show mood counts grouped by tag"""
+    mood_counts = {}
+    for _, row in df.iterrows():
+        tags = str(row.get("tags", "")).split(",")
+        mood = str(row.get("mood", "Unknown"))
+        for tag in tags:
+            tag = tag.strip().lower()
+            if tag:
+                mood_counts.setdefault(tag, Counter())
+                mood_counts[tag][mood] += 1
+
+    if not mood_counts:
+        print("No tags found.")
+        return
+
+    print("\n--- Mood distribution by Tag ---")
+    for tag, counts in mood_counts.items():
+        print(f"\nTag: {tag}")
+        for mood, count in counts.most_common():
+            print(f"  {mood}: {count}")
+
+
+def most_common_tags(df, top_n=5):
+    """list top N tags used"""
+    tag_counter = Counter()
+    for tags in df.get("tags", []):
+        for tag in str(tags).split(","):
+            tag = tag.strip().lower()
+            if tag:
+                tag_counter[tag] += 1
+
+    print(f"\n--- Top {top_n} Tags ---")
+    for tag, count in tag_counter.most_common(top_n):
+        print(f"{tag}: {count} times")
+
+
+def notes_word_frequency(df, top_n=10):
+    """find most common words in notes"""
+    text = " ".join(str(note) for note in df.get("notes", []) if note)
+    words = re.findall(r"\b\w+\b", text.lower())
+
+    stopwords = {"the", "and", "is", "to", "in", "of", "a", "for", "on"}
+    filtered = [w for w in words if w not in stopwords]
+
+    counter = Counter(filtered)
+    print(f"\n--- Top {top_n} Words in Notes ---")
+    for word, count in counter.most_common(top_n):
+        print(f"{word}: {count}")
+
+
+def search_notes(df, keyword):
+    """return rows where notes contain keyword"""
+    keyword = keyword.lower()
+    matches = df[df["notes"].astype(str).str.lower().str.contains(keyword)]
+
+    if matches.empty:
+        print(f"No notes found containing '{keyword}'.")
+    else:
+        print(f"\n--- Notes containing '{keyword}' ---")
+        print(matches[["date", "activity", "duration", "mood", "tags", "notes"]])
