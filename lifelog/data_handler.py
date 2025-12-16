@@ -18,6 +18,7 @@ def init_file(file_path: str = FILE_PATH) -> None:
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         with open(file_path, mode="w", newline="") as file:
             writer = csv.writer(file)
+         
             writer.writerow(CSV_HEADER)
         print(f"Created new lifelog file at: {file_path}")
 

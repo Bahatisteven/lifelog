@@ -18,7 +18,7 @@ def main():
         print("9. Search in notes")
         print("10. Quit")
 
-        choice = input("Choose an option (1-8): ").strip()
+        choice = input("Choose an option (1-10): ").strip()
 
         menu_options = {
             "1": add_activity,
@@ -34,11 +34,11 @@ def main():
 
         }
 
-        if choice in menu_options:
-            menu_options[choice]()
-        elif choice == "8":
+        if choice == "10":
             print("Goodbye!")
             break
+        elif choice in menu_options:
+            menu_options[choice]()
         else:
             print("Invalid choice. Please try again.")
 
