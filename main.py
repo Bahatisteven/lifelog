@@ -29,9 +29,7 @@ def main():
             "6": pandas_analysis,
             "7": export_summary_report,
             "8": filter_by_tag,
-            "9": search_notes, 
-            "10": lambda: export_summary_report(load_and_clean_data())
-
+            "9": search_notes
         }
 
         if choice == "10":
