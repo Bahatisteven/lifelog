@@ -17,6 +17,7 @@ def main():
         print("8. Filter by tag")
         print("9. Search in notes")
         print("10. Quit")
+        print("="*25)
 
         choice = input("Choose an option (1-10): ").strip()
 
